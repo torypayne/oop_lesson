@@ -4,6 +4,7 @@ from pyglet.window import key
 from core import GameElement
 import sys
 import time
+import random
 
 #### DO NOT TOUCH ####
 GAME_BOARD = None
@@ -60,13 +61,17 @@ class Character(GameElement):
         # disable movement
          
 
-
 class Gem(GameElement):
-    IMAGE = "BlueGem"
-    SOLID = False
+    imagelist = ["BlueGem", "GreenGem", "OrangeGem"]
+    
+    def __init__(self):
+        GameElement.__init__(self)
+        self.IMAGE = random.choice(self.imagelist)
+        self.SOLID = False
+
     def interact(self,PLAYER):
         PLAYER.inventory.append(self)
-        GAME_BOARD.draw_msg("You just acquired a gem! You have %d items!"%(len(PLAYER.inventory)))
+        GAME_BOARD.draw_msg("You just got some free stuff! You have %d items!"%(len(PLAYER.inventory)))
 
 class Key(GameElement):
     IMAGE = "Key"
@@ -92,21 +97,20 @@ class Door(GameElement):
             #     Door.IMAGE = "DoorOpen"
             #     PLAYER.x += 2
 
-class Cat(GameElement):
+class Anon(GameElement):
     IMAGE = "Cat"
+    def __init__(self,x,y):
+        GameElement.__init__(self)
+        self.x = x
+        self.y = y
+
     def interact(self,PLAYER):
-        GAME_BOARD.draw_msg('game over')
+        GAME_BOARD.draw_msg('The game is over! You hacked your way to %d items!'%(len(PLAYER.inventory)))
         PLAYER.isAlive = False
-
-
-        # else:
-        #     GAME_BOARD.draw_msg('You need the key to open the door.')
-    # if have key, can open door:
-
-    # else:
-        # door remains closed, have message stating this
-
-   
+    
+    def anon_pos(self):
+        direction = random.randint(1,4)
+        return direction
 
 
 
@@ -154,19 +158,20 @@ def initialize():
     GAME_BOARD.register(PLAYER)
     GAME_BOARD.set_el(2,2, PLAYER)
 
-    print PLAYER
 
-    cat = Cat()
-    GAME_BOARD.register(cat)
-    GAME_BOARD.set_el(6, 5, cat)
+    global anon
+    anon = Anon(5,4)
+    GAME_BOARD.register(anon)
+    GAME_BOARD.set_el(anon.x,anon.y,anon)
+    
 
 
 
 
 
 def keyboard_handler():
+    counter = 0
     direction = None
-
     if KEYBOARD[key.UP]:
         direction = "up"
     if KEYBOARD[key.DOWN]:
@@ -177,13 +182,43 @@ def keyboard_handler():
         direction = "right"
 
     if direction:
-        next_location = PLAYER.next_pos(direction)
-        next_x = next_location[0]
-        next_y = next_location[1]
+        next_loanonion = PLAYER.next_pos(direction)
+        
+        #Move the anon in a random loanonion each time the player spawns
+        GAME_BOARD.del_el(anon.x,anon.y)
+        next_anon_x = anon.x + random.randint(-1,1)
+        next_anon_y = anon.y + random.randint(-1,1)
+        if 0 > next_anon_y or next_anon_y >= 7 or 0 > next_anon_x or next_anon_x >= 7:
+            next_anon_x = anon.x
+            next_anon_y = anon.y
+        GAME_BOARD.set_el(next_anon_x, next_anon_y, anon)
+
+        #Code that prevents player from going off the board
+        next_x = next_loanonion[0]
+        next_y = next_loanonion[1]
         if 0 > next_y or next_y >= 7 or 0 > next_x or next_x >= 7:
             next_x = PLAYER.x
             next_y = PLAYER.y
             GAME_BOARD.draw_msg("You fool! You can't go off the ends of the earth")
+
+        #Code that has a chance to spawn a gem
+        if random.randint(1,6) == 6:
+                gem = Gem()
+                GAME_BOARD.register(gem)
+                GAME_BOARD.set_el(random.randint(0,6), random.randint(0,6), gem)
+
+        #Code that has a random chance to spawn an enemy
+        if random.randint(1,15) == 15:
+                anon2 = Anon(random.randint(0,6), random.randint(0,6))
+                GAME_BOARD.register(anon2)
+                GAME_BOARD.set_el(random.randint(0,6), random.randint(0,6), anon2)
+
+        #Code that regulary spawns an enemy
+        counter += 1
+        if counter % 3 == 0: 
+                anon3 = Anon(random.randint(0,6), random.randint(0,6))
+                GAME_BOARD.register(anon3)
+                GAME_BOARD.set_el(random.randint(0,6), random.randint(0,6), anon3)
 
         existing_el = GAME_BOARD.get_el(next_x, next_y)
         if existing_el is None or not existing_el.SOLID:
