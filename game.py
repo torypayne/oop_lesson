@@ -18,11 +18,11 @@ GAME_HEIGHT = 7
 
 #### Put class definitions here ####
 class Rock(GameElement):
-    IMAGE = "Rock"
+    IMAGE = "GRock"
     SOLID = True
 
 class Character(GameElement):
-    IMAGE = "Girl"
+    IMAGE = "Github"
     def __init__(self):
         GameElement.__init__(self)
         self.isAlive = True
@@ -30,8 +30,6 @@ class Character(GameElement):
 
     def die(self):
         self.isAlive = False
-        
-        
         return time.sleep(20)
         # enter = raw_input('<<  ')
         # if enter:
@@ -62,7 +60,7 @@ class Character(GameElement):
          
 
 class Gem(GameElement):
-    imagelist = ["BlueGem", "GreenGem", "OrangeGem"]
+    imagelist = ["Hackbright", "Job", "Shirt", "Hopper", "Beer"]
     
     def __init__(self):
         GameElement.__init__(self)
@@ -98,7 +96,7 @@ class Door(GameElement):
             #     PLAYER.x += 2
 
 class Anon(GameElement):
-    IMAGE = "Cat"
+    IMAGE = "Mask"
     def __init__(self,x,y):
         GameElement.__init__(self)
         self.x = x
@@ -124,7 +122,6 @@ def initialize():
         (2,1),
         (1,2),
         (3,2),
-        (2,3)
     ]
 
     rocks = []
@@ -137,7 +134,6 @@ def initialize():
         GAME_BOARD.set_el(pos[0], pos[1], rock)
         rocks.append(rock)
 
-    rocks[-1].SOLID = False
 
     # for rock in rocks:
     #     print rock
@@ -182,9 +178,9 @@ def keyboard_handler():
         direction = "right"
 
     if direction:
-        next_loanonion = PLAYER.next_pos(direction)
+        next_location = PLAYER.next_pos(direction)
         
-        #Move the anon in a random loanonion each time the player spawns
+        #Move the anon in a random location each time the player moves
         GAME_BOARD.del_el(anon.x,anon.y)
         next_anon_x = anon.x + random.randint(-1,1)
         next_anon_y = anon.y + random.randint(-1,1)
@@ -194,8 +190,8 @@ def keyboard_handler():
         GAME_BOARD.set_el(next_anon_x, next_anon_y, anon)
 
         #Code that prevents player from going off the board
-        next_x = next_loanonion[0]
-        next_y = next_loanonion[1]
+        next_x = next_location[0]
+        next_y = next_location[1]
         if 0 > next_y or next_y >= 7 or 0 > next_x or next_x >= 7:
             next_x = PLAYER.x
             next_y = PLAYER.y
@@ -206,6 +202,12 @@ def keyboard_handler():
                 gem = Gem()
                 GAME_BOARD.register(gem)
                 GAME_BOARD.set_el(random.randint(0,6), random.randint(0,6), gem)
+
+        #Code that randomly spawns rocks
+        if random.randint(1,12) == 12:
+                rock = Rock()
+                GAME_BOARD.register(rock)
+                GAME_BOARD.set_el(random.randint(0,6), random.randint(0,6), rock)
 
         #Code that has a random chance to spawn an enemy
         if random.randint(1,15) == 15:
@@ -224,22 +226,23 @@ def keyboard_handler():
         if existing_el is None or not existing_el.SOLID:
             GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
             GAME_BOARD.set_el(next_x, next_y, PLAYER)
+        print existing_el
         if existing_el:
             existing_el.interact(PLAYER)
-            if type(existing_el) == Door:
-                print "it's a door"
-                # is door open?
-                if Door.OPEN:
-                    print 'this is true'
-                    if PLAYER.x < next_x:
-                        PLAYER.x += 2
-                        #GAME_BOARD.del_el(PLAYER.x-2, PLAYER.y)
-                        #To keep a clone, don't delete the player
-                        Door.OPEN = False
-                    elif PLAYER.x > next_x:
-                         GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
-                         PLAYER.x -= 1
-                         Door.OPEN = False
+            # if type(existing_el) == Door:
+            #     print "it's a door"
+            #     # is door open?
+            #     if Door.OPEN:
+            #         print 'this is true'
+            #         if PLAYER.x < next_x:
+            #             PLAYER.x += 2
+            #             #GAME_BOARD.del_el(PLAYER.x-2, PLAYER.y)
+            #             #To keep a clone, don't delete the player
+            #             Door.OPEN = False
+            #         elif PLAYER.x > next_x:
+            #              GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
+            #              PLAYER.x -= 1
+            #              Door.OPEN = False
                     # if PLAYER.y < next_y:
                     #     PLAYER.y += 2
                     #     GAME_BOARD.del_el(PLAYER.x, PLAYER.y-2)
