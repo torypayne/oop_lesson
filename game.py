@@ -69,7 +69,18 @@ class Gem(GameElement):
 
     def interact(self,PLAYER):
         PLAYER.inventory.append(self)
-        GAME_BOARD.draw_msg("You just got some free stuff! You have %d items!"%(len(PLAYER.inventory)))
+        print str(self.IMAGE)
+        if str(self.IMAGE) == "Job":
+            GAME_BOARD.draw_msg("Whoah. A job offer!!!")
+        elif str(self.IMAGE) == "Hackbright":
+            GAME_BOARD.draw_msg("We love Hackbright.")
+        elif str(self.IMAGE) == "Shirt":
+            GAME_BOARD.draw_msg("A Scala tee shirt, omg!!!")
+        elif str(self.IMAGE) == "Beer":
+            GAME_BOARD.draw_msg("'Free' as in beer, but also free beer.")
+        else:
+            GAME_BOARD.draw_msg("Grace Hopper lives!!!")
+
 
 class Key(GameElement):
     IMAGE = "Key"
@@ -104,6 +115,7 @@ class Anon(GameElement):
 
     def interact(self,PLAYER):
         GAME_BOARD.draw_msg('The game is over! You hacked your way to %d items!'%(len(PLAYER.inventory)))
+        
         PLAYER.isAlive = False
     
     def anon_pos(self):
@@ -188,6 +200,7 @@ def keyboard_handler():
             next_anon_x = anon.x
             next_anon_y = anon.y
         GAME_BOARD.set_el(next_anon_x, next_anon_y, anon)
+        GAME_BOARD.draw_msg("Anonymous! Stay away.")
 
         #Code that prevents player from going off the board
         next_x = next_location[0]
@@ -202,12 +215,14 @@ def keyboard_handler():
                 gem = Gem()
                 GAME_BOARD.register(gem)
                 GAME_BOARD.set_el(random.randint(0,6), random.randint(0,6), gem)
+                GAME_BOARD.draw_msg("Free stuff. Must go get.")
 
         #Code that randomly spawns rocks
         if random.randint(1,12) == 12:
                 rock = Rock()
                 GAME_BOARD.register(rock)
                 GAME_BOARD.set_el(random.randint(0,6), random.randint(0,6), rock)
+                GAME_BOARD.draw_msg("Google even owns ROCKS")
 
         #Code that has a random chance to spawn an enemy
         if random.randint(1,15) == 15:
